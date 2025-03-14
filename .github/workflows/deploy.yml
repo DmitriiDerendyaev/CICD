@@ -50,5 +50,5 @@ jobs:
             # Собираем и запускаем контейнер
             cd /home/$SSH_USER/app
             docker build -t spring-app:latest .
-            docker run -d --name spring-app -p 8080:8080 spring-app:latest
+            docker run -d --name spring-app -p 8081:8080 spring-app:latest
           EOF
