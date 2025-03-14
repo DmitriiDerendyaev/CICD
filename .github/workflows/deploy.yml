@@ -36,29 +36,19 @@ jobs:
           SSH_HOST: 91.146.28.240
           SSH_PASSWORD: homic
         run: |
+          # Копируем файлы с использованием sshpass
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no target/CICD-0.0.1-SNAPSHOT.jar $SSH_USER@$SSH_HOST:/home/$SSH_USER/app/app.jar
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no Dockerfile $SSH_USER@$SSH_HOST:/home/$SSH_USER/app/Dockerfile
+
+          # Выполняем команды на сервере
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
-            # Останавливаем и удаляем старый контейнер (если существует)
-            # docker stop spring-app || true
-            # docker rm spring-app || true
+            # Останавливаем и удаляем старый контейнер
+            docker stop spring-app || true
+            docker rm spring-app || true
+            docker rmi spring-app:latest || true
 
-            # Удаляем старый образ (если существует)
-            # docker rmi spring-app:latest || true
-
-            # Создаем директорию для приложения
-            mkdir -p /home/$SSH_USER/app
-            exit
-          EOF
-
-          # Копируем новый JAR-файл и Dockerfile на сервер
-          scp -o StrictHostKeyChecking=no target/CICD-0.0.1-SNAPSHOT.jar homic@91.146.28.240:/home/homic/app/app.jar
-          scp -o StrictHostKeyChecking=no Dockerfile homic@91.146.28.240:/home/homic/app/Dockerfile
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
-            # Переходим в директорию с приложением
+            # Собираем и запускаем контейнер
             cd /home/$SSH_USER/app
-
-            # Собираем новый Docker-образ
             docker build -t spring-app:latest .
-
-            # Запускаем контейнер
             docker run -d --name spring-app -p 8080:8080 spring-app:latest
           EOF
