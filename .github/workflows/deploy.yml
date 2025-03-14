@@ -50,9 +50,8 @@ jobs:
           EOF
 
           # Копируем новый JAR-файл и Dockerfile на сервер
-          scp -o StrictHostKeyChecking=no target/demo-0.0.1-SNAPSHOT.jar homic@91.146.28.240:/home/homic/app/app.jar
+          scp -o StrictHostKeyChecking=no target/CICD-0.0.1-SNAPSHOT.jar homic@91.146.28.240:/home/homic/app/app.jar
           scp -o StrictHostKeyChecking=no Dockerfile homic@91.146.28.240:/home/homic/app/Dockerfile
-
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
             # Переходим в директорию с приложением
             cd /home/$SSH_USER/app
