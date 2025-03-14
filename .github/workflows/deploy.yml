@@ -38,11 +38,11 @@ jobs:
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
             # Останавливаем и удаляем старый контейнер (если существует)
-            docker stop spring-app || true
-            docker rm spring-app || true
+            # docker stop spring-app || true
+            # docker rm spring-app || true
 
             # Удаляем старый образ (если существует)
-            docker rmi spring-app:latest || true
+            # docker rmi spring-app:latest || true
 
             # Создаем директорию для приложения
             mkdir -p /home/$SSH_USER/app
