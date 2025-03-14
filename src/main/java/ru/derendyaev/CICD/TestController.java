@@ -9,6 +9,6 @@ public class TestController {
 
     @GetMapping("/test")
     public String test() {
-        return "Test CICD completed GitHub actions";
+        return "Switch to SSH key authentication";
     }
 }
