@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
-    @GetMapping("/test")
+    @GetMapping("/love")
     public String test() {
-        return "Switch to SSH key authentication";
+        return "Love u so much and MISS uuuu!!!!!";
     }
 }
