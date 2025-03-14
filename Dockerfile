@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Копируем JAR-файл приложения
-COPY target/CICD-0.0.1-SNAPSHOT.jar app.jar
+COPY app.jar app.jar
 
 # Команда для запуска приложения
 CMD ["java", "-jar", "app.jar"]
