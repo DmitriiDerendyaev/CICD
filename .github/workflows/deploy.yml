@@ -1,0 +1,59 @@
+name: Build and Deploy to VPS
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Клонирование репозитория
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Установка JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Сборка проекта
+      - name: Build with Maven
+        run: mvn clean package
+
+      # Логин на VPS через SSH
+      - name: Deploy to VPS
+        env:
+          SSH_USER: homic
+          SSH_HOST: 91.146.28.240
+          SSH_PASSWORD: homic
+        run: |
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
+            # Останавливаем и удаляем старый контейнер (если существует)
+            docker stop spring-app || true
+            docker rm spring-app || true
+
+            # Удаляем старый образ (если существует)
+            docker rmi spring-app:latest || true
+
+            # Копируем новый JAR-файл и Dockerfile на сервер
+            mkdir -p /home/$SSH_USER/app
+            exit
+          EOF
+          scp -o StrictHostKeyChecking=no target/demo-0.0.1-SNAPSHOT.jar homic@91.146.28.240:/home/homic/app/app.jar
+          scp -o StrictHostKeyChecking=no Dockerfile homic@91.146.28.240:/home/homic/app/Dockerfile
+
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
+            # Переходим в директорию с приложением
+            cd /home/$SSH_USER/app
+
+            # Собираем новый Docker-образ
+            docker build -t spring-app:latest .
+
+            # Запускаем контейнер
+            docker run -d --name spring-app -p 8080:8080 spring-app:latest
+          EOF
